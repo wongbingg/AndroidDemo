@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
@@ -79,8 +80,17 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun MainScreen() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { BusinessCard(navController) }
-        composable("second") { DiceRollerApp(navController = navController) }
+        composable("home") {
+            BusinessCard(navController)
+        }
+        composable("second") {
+            DiceRollerApp(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center),
+                navController = navController
+            )
+        }
     }
 }
 
@@ -191,6 +201,9 @@ fun DiceRollerApp(modifier: Modifier = Modifier, navController: NavHostControlle
 @Composable
 fun GreetingPreview() {
     AndroidDemoTheme {
-        MainScreen()
+        DiceRollerApp(
+            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
+            navController = rememberNavController()
+        )
     }
 }
