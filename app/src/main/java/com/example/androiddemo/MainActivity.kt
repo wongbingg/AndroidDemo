@@ -20,12 +20,17 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.androiddemo.ui.theme.AndroidDemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -51,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BusinessCard()
+                    MainScreen()
                 }
             }
         }
@@ -67,7 +76,17 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun BusinessCard() {
+fun MainScreen() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") { BusinessCard(navController) }
+        composable("second") { DiceRollerApp(navController = navController) }
+    }
+}
+
+@Composable
+fun BusinessCard(navController: NavHostController) {
+
     val image = painterResource(id = R.drawable.android_logo)
     Column(
         verticalArrangement = Arrangement.Center,
@@ -116,6 +135,10 @@ fun BusinessCard() {
                 content = "leewonbeen@gmail.com"
             )
         }
+
+        Button(onClick = { navController.navigate("second") }) {
+            Text(text = "Go to DiceRoller")
+        }
     }
 }
 @Composable
@@ -134,10 +157,40 @@ fun infoRow(icon: ImageVector, content: String) {
     }
 }
 
+@Composable
+fun DiceRollerApp(modifier: Modifier = Modifier, navController: NavHostController) {
+    var result by remember { mutableStateOf(1) }
+    val imageResource = when (result) {
+        1 -> R.drawable.dice_1
+        2 -> R.drawable.dice_2
+        3 -> R.drawable.dice_3
+        4 -> R.drawable.dice_4
+        5 -> R.drawable.dice_5
+        else -> R.drawable.dice_6
+    }
+    Column (
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(imageResource),
+            contentDescription = "1"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { result = (1..6).random() }) {
+            Text("Roll")
+        }
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text(text = "Go Back")
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     AndroidDemoTheme {
-        BusinessCard()
+        MainScreen()
     }
 }
