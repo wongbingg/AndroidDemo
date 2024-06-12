@@ -1,30 +1,33 @@
 package com.example.androiddemo
 
 import android.os.Bundle
+import android.view.RoundedCorner
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,11 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +58,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AndroidDemoTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    BusinessCard()
-//                }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -88,6 +89,11 @@ fun MainScreen() {
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center),
+                navController = navController
+            )
+        }
+        composable("lemonade") {
+            Lemonade(
                 navController = navController
             )
         }
@@ -149,6 +155,9 @@ fun BusinessCard(navController: NavHostController) {
         Button(onClick = { navController.navigate("second") }) {
             Text(text = "Go to DiceRoller")
         }
+        Button(onClick = { navController.navigate("lemonade") }) {
+            Text(text = "Go to Lemonade")
+        }
     }
 }
 @Composable
@@ -169,7 +178,11 @@ fun infoRow(icon: ImageVector, content: String) {
 
 @Composable
 fun DiceRollerApp(modifier: Modifier = Modifier, navController: NavHostController) {
+
+    // remember 컴포저블을 이용해 컴포지션 객체를 메모리에 저장
+    // mutableStateOf() 함수로 UI를 새로고침하여 observable을 만듦
     var result by remember { mutableStateOf(1) }
+
     val imageResource = when (result) {
         1 -> R.drawable.dice_1
         2 -> R.drawable.dice_2
@@ -197,13 +210,97 @@ fun DiceRollerApp(modifier: Modifier = Modifier, navController: NavHostControlle
     }
 }
 
+@Composable
+fun Lemonade(navController: NavHostController) {
+    var index by remember { mutableStateOf(1) }
+    val squeezeCount = (2..4).random()
+    var squeezeCountSubscriber = 0
+
+    val imageResource = when (index) {
+        1 -> R.drawable.lemon_tree
+        2 -> R.drawable.lemon_squeeze
+        3 -> R.drawable.lemon_drink
+        4 -> R.drawable.lemon_restart
+        else -> R.drawable.dice_6
+    }
+
+    val descriptionResource = when (index) {
+        1 -> "Tap the lemon tree to select a lemon"
+        2 -> "Keep tapping the lemon to squeeze it"
+        3 -> "Tap the lemonade to drink it"
+        4 -> "Tap the empty glass to start again"
+        else -> "[Error] Something went wrong!"
+    }
+    Box {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                "Lemonade",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color(0xFFf9e44b))
+            )
+
+
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Button(
+                onClick = {
+                    if (index == 4) {
+                        index = 1
+                    } else {
+                        if (index == 2) { // 레몬의 경우
+                            // 2..4 사이 랜덤한 횟수를 탭해야 다음으로 이동하도록
+                            squeezeCountSubscriber++
+                            if (squeezeCount == squeezeCountSubscriber) {
+                                index++
+                            } else {
+                                return@Button
+                            }
+                            return@Button
+                        }
+                        index++
+                    }
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(200.dp),
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFc3ecd2)
+                )
+            ) {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = "1"
+                )
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(descriptionResource)
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(onClick = { navController.popBackStack() }) {
+                Text("go back")
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     AndroidDemoTheme {
-        DiceRollerApp(
-            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
-            navController = rememberNavController()
-        )
+        Lemonade(navController = rememberNavController())
     }
 }
