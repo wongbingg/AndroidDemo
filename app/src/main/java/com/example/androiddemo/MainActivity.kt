@@ -17,9 +17,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
@@ -30,7 +33,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +46,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +58,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androiddemo.ui.theme.AndroidDemoTheme
+import java.text.NumberFormat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,6 +102,11 @@ fun MainScreen() {
         }
         composable("lemonade") {
             Lemonade(
+                navController = navController
+            )
+        }
+        composable("tipcalculator") {
+            TipCalculator(
                 navController = navController
             )
         }
@@ -157,6 +170,9 @@ fun BusinessCard(navController: NavHostController) {
         }
         Button(onClick = { navController.navigate("lemonade") }) {
             Text(text = "Go to Lemonade")
+        }
+        Button(onClick = { navController.navigate("tipcalculator") }) {
+            Text(text = "Go to TipCalculator")
         }
     }
 }
@@ -297,10 +313,78 @@ fun Lemonade(navController: NavHostController) {
     }
 }
 
+@Composable
+fun TipCalculator(navController: NavHostController) {
+    // @State 변수와 같은 역할
+    // 이런 상태값을 가지고있으면 Stateful , 없으면 Stateless 라고 한다.
+    var amountInput by remember { mutableStateOf("") }
+
+    val amount = amountInput.toDoubleOrNull() ?: 0.0 // Elvis 연산자 - null이면 뒤의 표현식을 반환
+    val tip = calculateTip(amount)
+
+    Column(
+        modifier = Modifier
+            .statusBarsPadding()
+            .padding(horizontal = 40.dp)
+            .safeDrawingPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(R.string.calculate_tip),
+            modifier = Modifier
+                .padding(bottom = 16.dp, top = 40.dp)
+                .align(alignment = Alignment.Start)
+        )
+
+        EditNumberField(
+            value = amountInput,
+            onValueChange = { amountInput = it },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
+        Text(
+            text = stringResource(R.string.tip_amount, tip),
+            style = MaterialTheme.typography.displaySmall
+        )
+        Spacer(modifier = Modifier.height(150.dp))
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text("go back")
+        }
+    }
+}
+
+@Composable
+fun EditNumberField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier
+) {
+    // 기존에 가지고있던 State 변수를 상위함수로 보냄으로써 이를 "상태 호이스팅" 이라 칭한다.
+    // 이제 이 함수는 Stateless 함수가 되었다.
+    TextField(
+        value = value,
+        onValueChange = onValueChange, // it 은 람다표현식의 파라미터
+        label = { Text(stringResource(id = R.string.bill_amount)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = modifier,
+    )
+}
+
+
+private fun calculateTip(amount: Double, tipPercent: Double = 15.0): String {
+    val tip = tipPercent / 100 * amount
+    return NumberFormat.getCurrencyInstance().format(tip)
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     AndroidDemoTheme {
-        Lemonade(navController = rememberNavController())
+//        Lemonade(navController = rememberNavController())
+        TipCalculator(navController = rememberNavController())
     }
 }
