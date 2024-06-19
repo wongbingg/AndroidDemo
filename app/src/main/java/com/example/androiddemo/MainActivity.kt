@@ -384,7 +384,6 @@ private fun calculateTip(amount: Double, tipPercent: Double = 15.0): String {
 @Composable
 fun GreetingPreview() {
     AndroidDemoTheme {
-//        Lemonade(navController = rememberNavController())
         TipCalculator(navController = rememberNavController())
     }
 }
