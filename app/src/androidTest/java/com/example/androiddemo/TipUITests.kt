@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.example.androiddemo.ui.theme.AndroidDemoTheme
+import com.example.androiddemo.views.TipCalculator
 import org.junit.Rule
 import org.junit.Test
 import java.text.NumberFormat
