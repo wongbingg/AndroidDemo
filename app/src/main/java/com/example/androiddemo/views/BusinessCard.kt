@@ -93,6 +93,9 @@ fun BusinessCard(navController: NavHostController) {
         Button(onClick = { navController.navigate("tipcalculator") }) {
             Text(text = "Go to TipCalculator")
         }
+        Button(onClick = { navController.navigate("artspace") }) {
+            Text(text = "Go to ArtSpace")
+        }
     }
 }
 @Composable

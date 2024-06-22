@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androiddemo.ui.theme.AndroidDemoTheme
+import com.example.androiddemo.views.ArtSpace
 import com.example.androiddemo.views.BusinessCard
 import com.example.androiddemo.views.DiceRollerApp
 import com.example.androiddemo.views.Lemonade
@@ -60,6 +61,11 @@ fun MainScreen() {
         }
         composable("tipcalculator") {
             TipCalculator(
+                navController = navController
+            )
+        }
+        composable("artspace") {
+            ArtSpace(
                 navController = navController
             )
         }
