@@ -16,7 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.androiddemo.model.Affirmation
 import com.example.androiddemo.ui.theme.AndroidDemoTheme
+import com.example.androiddemo.views.AffirmationApp
 import com.example.androiddemo.views.ArtSpace
 import com.example.androiddemo.views.BusinessCard
 import com.example.androiddemo.views.DiceRollerApp
@@ -66,6 +68,11 @@ fun MainScreen() {
         }
         composable("artspace") {
             ArtSpace(
+                navController = navController
+            )
+        }
+        composable("affirmation") {
+            AffirmationApp(
                 navController = navController
             )
         }

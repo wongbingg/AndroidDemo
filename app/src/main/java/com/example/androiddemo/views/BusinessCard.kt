@@ -96,6 +96,9 @@ fun BusinessCard(navController: NavHostController) {
         Button(onClick = { navController.navigate("artspace") }) {
             Text(text = "Go to ArtSpace")
         }
+        Button(onClick = { navController.navigate("affirmation") }) {
+            Text(text = "Go to Affirmation")
+        }
     }
 }
 @Composable
